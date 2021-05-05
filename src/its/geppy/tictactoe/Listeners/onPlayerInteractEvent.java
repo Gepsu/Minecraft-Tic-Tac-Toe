@@ -3,7 +3,11 @@ package its.geppy.tictactoe.Listeners;
 import its.geppy.tictactoe.TicTacToe;
 import its.geppy.tictactoe.Utilities.BoardManager;
 import its.geppy.tictactoe.Utilities.GameData;
+import its.geppy.tictactoe.Utilities.SoundManager;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,6 +31,9 @@ public class onPlayerInteractEvent implements Listener {
         Player player = e.getPlayer();
         ItemStack heldItem = player.getInventory().getItemInMainHand();
 
+        if (!player.hasPermission("ttt.play"))
+            return;
+
         if (!heldItem.hasItemMeta())
             return;
 
@@ -47,6 +54,11 @@ public class onPlayerInteractEvent implements Listener {
                     .orElse(null);
             if (found == null)
                 return;
+        } else {
+            if (!opponent.hasPermission("ttt.play")) {
+                player.sendMessage(ChatColor.RED + "They don't have a permission to play.");
+                return;
+            }
         }
 
         if (TicTacToe.activeGames.stream().anyMatch(game -> {
@@ -65,6 +77,10 @@ public class onPlayerInteractEvent implements Listener {
             return false;
         }))
             return;
+
+        SoundManager.playSound(player, Sound.BLOCK_BELL_RESONATE);
+        if (opponent instanceof Player)
+            SoundManager.playSound((Player) opponent, Sound.BLOCK_BELL_RESONATE);
 
         BoardManager.buildBoard(player, opponent);
 
@@ -105,8 +121,10 @@ public class onPlayerInteractEvent implements Listener {
 
         }
 
-        if (e.getPlayer().equals(game.getChallenger()) || e.getPlayer().equals(game.getOpponent()))
+        if (e.getPlayer().equals(game.getChallenger()) || e.getPlayer().equals(game.getOpponent())) {
+            SoundManager.playSound(e.getPlayer(), Sound.BLOCK_STONE_BUTTON_CLICK_ON);
             BoardManager.clicked((MagmaCube) e.getRightClicked(), game);
+        }
 
     }
 

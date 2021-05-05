@@ -3,7 +3,6 @@ api-version: 1.16
 version: 1.0
 author: ItsGeppy
 main: its.geppy.tictactoe.TicTacToe
-depend: [VentureKraftAPI]
 commands:
   tictactoe:
     aliases: ["ttt"]

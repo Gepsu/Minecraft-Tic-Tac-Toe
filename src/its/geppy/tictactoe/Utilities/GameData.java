@@ -6,12 +6,9 @@ import org.bukkit.entity.*;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 import static its.geppy.tictactoe.TicTacToe.getMain;
 
@@ -249,9 +246,8 @@ public class GameData {
         TicTacToe.activeGames.add(this);
 
         try {
-            Team team = TicTacToe.getMain().scoreboard.getTeam("ttt_nocollision");
-            team.addEntry(challenger.getUniqueId().toString());
-            team.addEntry(opponent.getUniqueId().toString());
+            TicTacToe.noCollisionTeam.addEntry(challenger.getUniqueId().toString());
+            TicTacToe.noCollisionTeam.addEntry(opponent.getUniqueId().toString());
         } catch (Exception ignored) { }
 
         taskID = new BukkitRunnable() {
@@ -291,23 +287,36 @@ public class GameData {
     private void queueGameEnd(int taskID, Winner winner) {
         for (int i = 0; i < magmaCubes.size(); i++) {
             try {
-                Team team = TicTacToe.getMain().scoreboard.getTeam("ttt_nocollision");
-                team.removeEntry(magmaCubes.get(i).getUniqueId().toString());
-                team.removeEntry(challenger.getName());
-                team.removeEntry(opponent.getName());
+                TicTacToe.noCollisionTeam.removeEntry(magmaCubes.get(i).getUniqueId().toString());
+                TicTacToe.noCollisionTeam.removeEntry(challenger.getName());
+                TicTacToe.noCollisionTeam.removeEntry(opponent.getName());
             } catch (Exception ignored) { }
             magmaCubes.get(i).remove();
         }
 
         if (winner.equals(Winner.CHALLENGER)) {
             challenger.sendMessage(ChatColor.GREEN + "You won!");
+            SoundManager.playSound(challenger, Sound.ENTITY_PLAYER_LEVELUP);
+
             opponent.sendMessage(ChatColor.RED + "You lost!");
+            if (opponent instanceof Player)
+                SoundManager.playSound((Player) opponent, Sound.ENTITY_PLAYER_HURT);
+
         } else if (winner.equals(Winner.OPPONENT)) {
             challenger.sendMessage(ChatColor.RED + "You lost!");
+            SoundManager.playSound(challenger, Sound.ENTITY_PLAYER_HURT);
+
             opponent.sendMessage(ChatColor.GREEN + "You won!");
+            if (opponent instanceof Player)
+                SoundManager.playSound((Player) opponent, Sound.ENTITY_PLAYER_LEVELUP);
+
         } else {
             challenger.sendMessage(ChatColor.YELLOW + "You tied!");
             opponent.sendMessage(ChatColor.YELLOW + "You tied!");
+
+            SoundManager.playSound(challenger, Sound.ENTITY_PLAYER_BREATH);
+            if (opponent instanceof Player)
+                SoundManager.playSound((Player) opponent, Sound.ENTITY_PLAYER_BREATH);
         }
 
         Bukkit.getScheduler().runTaskLater(getMain(), () -> {
@@ -322,10 +331,9 @@ public class GameData {
 
         for (int i = 0; i < magmaCubes.size(); i++) {
             try {
-                Team team = TicTacToe.getMain().scoreboard.getTeam("ttt_nocollision");
-                team.removeEntry(magmaCubes.get(i).getUniqueId().toString());
-                team.removeEntry(challenger.getUniqueId().toString());
-                team.removeEntry(opponent.getUniqueId().toString());
+                TicTacToe.noCollisionTeam.removeEntry(magmaCubes.get(i).getUniqueId().toString());
+                TicTacToe.noCollisionTeam.removeEntry(challenger.getUniqueId().toString());
+                TicTacToe.noCollisionTeam.removeEntry(opponent.getUniqueId().toString());
             } catch (Exception ignored) { }
             magmaCubes.get(i).remove();
         }

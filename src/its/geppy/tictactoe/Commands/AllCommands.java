@@ -1,5 +1,6 @@
 package its.geppy.tictactoe.Commands;
 
+import its.geppy.tictactoe.Utilities.SoundManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,6 +17,8 @@ public class AllCommands implements CommandExecutor, TabCompleter {
 
     Map<String, String> commandList = new HashMap<String, String>() {{
         put("play", "ttt.play");
+        put("sounds off", "ttt.play");
+        put("sounds on", "ttt.play");
     }};
 
     @Override
@@ -35,6 +38,12 @@ public class AllCommands implements CommandExecutor, TabCompleter {
 
             case "play":
                 ChallengeStick.spawnItem(player);
+                break;
+            case "sounds on":
+                SoundManager.soundOn(player);
+                break;
+            case "sounds off":
+                SoundManager.soundOff(player);
                 break;
             case "no_permission":
                 player.sendMessage(ChatColor.RED + "No permission.");

@@ -39,6 +39,9 @@ public class ChallengeStick {
     }
 
     private static boolean isInCooldown(Player player) {
+        if (player.hasPermission("ttt.play.nocooldown"))
+            return false;
+
         if (!cooldowns.containsKey(player.getUniqueId()))
             return false;
 

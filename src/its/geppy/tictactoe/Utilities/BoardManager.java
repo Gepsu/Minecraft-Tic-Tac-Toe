@@ -74,8 +74,7 @@ public class BoardManager {
                     setting.setSize(1);
 
                     try {
-                        Team team = TicTacToe.getMain().scoreboard.getTeam("ttt_nocollision");
-                        team.addEntry(setting.getUniqueId().toString());
+                        TicTacToe.noCollisionTeam.addEntry(setting.getUniqueId().toString());
                     } catch (Exception ignored) { }
 
                     PersistentDataContainer dataContainer = setting.getPersistentDataContainer();

@@ -2,7 +2,7 @@
 minimum-distance-between-boards: 3
 
 # Stops players from spawning new items over and over
-sticktactoe-cooldown-in-seconds: 5 #300
+sticktactoe-cooldown-in-seconds: 60
 
 # Removes the board after X seconds
 maximum-idle-time-in-seconds: 30
