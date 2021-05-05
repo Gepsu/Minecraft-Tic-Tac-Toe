@@ -10,9 +10,12 @@ A Tic Tac Toe plugin for Minecraft Spigot using particles.
 - Sounds!
 
 ## Commands
-- `/ttt play` - gives you a stick you use to play. Right click players or animals to start
+- `/ttt play` - gives you a stick you use to play
 - `/ttt sounds on/off` - as you might've guessed, turns sounds on and off
 
 ## Permissions
 - `ttt.play` - required to play
 - `ttt.play.nocooldown` - used to bypass the cooldown for getting the stick
+
+## How to play
+Once you have a StickTacToe (/ttt play), just right click a player or entities that have been listed in the config file and you're golden! Default entities include villagers and most of the animals.
