@@ -31,8 +31,10 @@ public class onPlayerInteractEvent implements Listener {
         Player player = e.getPlayer();
         ItemStack heldItem = player.getInventory().getItemInMainHand();
 
-        if (!player.hasPermission("ttt.play"))
+        if (!player.hasPermission("ttt.play")) {
+            player.sendMessage(ChatColor.RED + "You don't have a permission to play.");
             return;
+        }
 
         if (!heldItem.hasItemMeta())
             return;
