@@ -1,0 +1,26 @@
+# Stops players from playing too close to eachother
+minimum-distance-between-boards: 3
+
+# Stops players from spawning new items over and over
+sticktactoe-cooldown-in-seconds: 5 #300
+
+# Removes the board after X seconds
+maximum-idle-time-in-seconds: 30
+
+# Removes the board if players walk too far away from it
+maximum-distance-from-board: 5
+
+# List of entities player can play against
+list-of-ai-opponents:
+  - VILLAGER
+  - PIG
+  - COW
+  - CHICKEN
+  - SHEEP
+  - WOLF
+  - HORSE
+  - DONKEY
+  - PANDA
+  - LLAMA
+  - CAT
+  - MOOSHROOM

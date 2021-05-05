@@ -1,0 +1,3 @@
+<template>
+  <input-field default="net.venturekraft.vents">IJ_BASE_PACKAGE</input-field>
+</template>
