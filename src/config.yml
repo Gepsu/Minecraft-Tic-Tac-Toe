@@ -8,9 +8,11 @@ sticktactoe-cooldown-in-seconds: 60
 maximum-idle-time-in-seconds: 30
 
 # Removes the board if players walk too far away from it
-maximum-distance-from-board: 5
+maximum-distance-from-board: 7
 
-# List of entities player can play against
+# List of entities player can play against. PLAYER automatically included!
+# Entity types can be found here:
+# https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
 list-of-ai-opponents:
   - VILLAGER
   - PIG
@@ -24,3 +26,32 @@ list-of-ai-opponents:
   - LLAMA
   - CAT
   - MOOSHROOM
+
+# Maximum number of rewards against the same player in X minutes. 0 = no limit
+# This doesn't affect playing against other entities such as villagers.
+# Default: Maximum of 3 rewards in 15 minutes
+reward-limit:
+  amount: 3
+  time: 15
+
+# Example how to give rewards to winners/losers. Weight needs to be a whole
+# number and if there is no weight, the reward will be ignored. Loser rewards
+# will also be ignored unless you're playing against a player.
+# Entity types can be found here:
+# https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+
+#rewards:
+#  PLAYER:
+#    custom_reward1:
+#      winner: minecraft:xp give $winner 1l
+#      loser: minecraft:kill $loser
+#      weight: 10
+#    another_reward:
+#      winner: minecraft:give $winner diamond 1
+#      weight: 1
+#  VILLAGER:
+#    no_reward:
+#      weight: 3
+#    and_another_reward:
+#      winner: minecraft:give $winner emerald 2
+#      weight: 1

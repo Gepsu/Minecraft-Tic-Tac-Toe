@@ -1,15 +1,7 @@
 package its.geppy.tictactoe.Utilities;
 
-import its.geppy.tictactoe.TicTacToe;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.*;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -60,29 +52,10 @@ public class BoardManager {
                 double dy = boardSize * y / 3;
 
                 Vector vector = game.calculatePosition(dx, dy);
+                vector.subtract(new Vector(0, .3, 0));
 
-                int finalX = x;
-                int finalY = y;
-                MagmaCube cube = center.getWorld().spawn(vector.toLocation(center.getWorld()).add(0, -.3, 0), MagmaCube.class, (setting) -> {
-                    setting.setCustomName("tictactoe_clickable");
-                    setting.setInvisible(true);
-                    setting.setGravity(false);
-                    setting.setInvulnerable(true);
-                    setting.setCollidable(false);
-                    setting.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 9999, 99, false, false, false));
-                    setting.setAI(false);
-                    setting.setSize(1);
-
-                    try {
-                        TicTacToe.noCollisionTeam.addEntry(setting.getUniqueId().toString());
-                    } catch (Exception ignored) { }
-
-                    PersistentDataContainer dataContainer = setting.getPersistentDataContainer();
-                    dataContainer.set(new NamespacedKey(TicTacToe.getMain(), "board_x"), PersistentDataType.BYTE, (byte) finalX);
-                    dataContainer.set(new NamespacedKey(TicTacToe.getMain(), "board_y"), PersistentDataType.BYTE, (byte) finalY);
-                });
-
-                game.magmaCubes.add(cube);
+                game.clickables.put(vector, new Byte[]{(byte) x, (byte) y});
+                //particleMap.put(vector, GameData.ParticleJob.DEBUG);
 
             }
         }
@@ -91,8 +64,7 @@ public class BoardManager {
 
     }
 
-    public static void clicked(MagmaCube cube, GameData game) {
-
+    public static void clicked(Vector clickable, GameData game) {
         GameData.Turn turn = game.nextTurn();
         List<String> shape;
 
@@ -111,13 +83,13 @@ public class BoardManager {
                 double dx = (x - 2) * (boardSize * 0.04);
                 double dy = (y - 2) * (boardSize * 0.04);
 
-                Vector vector = game.calculatePosition(cube.getLocation().add(0, -(boardSize * 0.45), 0).toVector(), dx, dy);
+                Vector vector = game.calculatePosition(clickable.toLocation(game.getChallenger().getWorld()).add(0, -(boardSize * 0.45), 0).toVector(), dx, dy);
                 game.particleMap.put(vector, game.getTurn() == GameData.Turn.O ? GameData.ParticleJob.O : GameData.ParticleJob.X);
 
             }
         }
 
-        game.removeClickable(cube);
+        game.removeClickable(clickable);
 
     }
 
@@ -141,4 +113,29 @@ public class BoardManager {
         );
     }
 
+    public static Vector getClickable(Player player, GameData game) {
+
+        Vector finalClickable = null;
+        double smallestAngle = Double.MAX_VALUE;
+
+        for (Vector clickable : game.getClickables().keySet()) {
+
+            Vector direction = clickable.clone()
+                    .subtract(player.getEyeLocation().toVector())
+                    .normalize();
+            double angle = direction.angle(player.getEyeLocation().getDirection());
+
+            if (angle < smallestAngle) {
+                smallestAngle = angle;
+                finalClickable = clickable;
+            }
+
+
+        }
+
+        if (smallestAngle > 0.25)
+            finalClickable = null;
+
+        return finalClickable;
+    }
 }

@@ -11,8 +11,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +25,6 @@ public class TicTacToe extends JavaPlugin implements CommandExecutor {
 
     public static int maxIdleTime;
     public static int maxDistanceFromBoard;
-
-    public static Team noCollisionTeam;
 
     @Override
     public void onEnable() {
@@ -47,16 +43,6 @@ public class TicTacToe extends JavaPlugin implements CommandExecutor {
 
         maxIdleTime = getMain().getConfig().getInt("maximum-idle-time-in-seconds") * 20;
         maxDistanceFromBoard = getMain().getConfig().getInt("maximum-distance-from-board");
-
-        Scoreboard scoreboard = getServer().getScoreboardManager().getMainScoreboard();
-        try {
-            noCollisionTeam = scoreboard.registerNewTeam("ttt_nocollision");
-            noCollisionTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
-            noCollisionTeam.setCanSeeFriendlyInvisibles(false);
-        } catch (Exception ignored) {
-            noCollisionTeam = scoreboard.getTeam("ttt_nocollision");
-        }
-
 
     }
 
@@ -78,7 +64,6 @@ public class TicTacToe extends JavaPlugin implements CommandExecutor {
         stickTacToe.setItemMeta(meta);
 
         return stickTacToe;
-        //return Processes.buildItem("&6&lStick&f&lTac&6&lToe", null, Material.STICK, 1);
     }
 
 }

@@ -14,7 +14,7 @@ import static its.geppy.tictactoe.TicTacToe.getMain;
 
 public class GameData {
 
-    protected List<MagmaCube> magmaCubes;
+    protected Map<Vector, Byte[]> clickables;
     protected Map<Vector, ParticleJob> particleMap;
 
     private final ArmorStand stand;
@@ -30,6 +30,9 @@ public class GameData {
 
     private int ticksSinceReset = 0;
 
+    private boolean pregame = true;
+    private boolean gameOver = false;
+
     private int taskID;
 
     private final String[][] board = {
@@ -39,6 +42,7 @@ public class GameData {
     };
 
     public enum ParticleJob {
+        DEBUG,
         FRAME,
         X,
         O
@@ -70,10 +74,14 @@ public class GameData {
         tempDirection.setPitch(0);
         this.direction = tempDirection.getDirection().normalize();
 
-        magmaCubes = new ArrayList<>();
+        clickables = new HashMap<>();
 
         turn = Turn.X;
+
+        Bukkit.getScheduler().runTaskLater(getMain(), () -> pregame = false, 10);
     }
+
+    public boolean isPreGame() { return pregame; }
 
     public boolean getAI() {
         return AI;
@@ -96,9 +104,7 @@ public class GameData {
         return opponent;
     }
 
-    public List<MagmaCube> getMagmaCubes() {
-        return magmaCubes;
-    }
+    public Map<Vector, Byte[]> getClickables() { return clickables; }
 
     public Vector calculatePosition(Vector origin, double x, double y) {
         return new Vector(
@@ -116,18 +122,16 @@ public class GameData {
         );
     }
 
-    public void removeClickable(MagmaCube cube) {
+    public void removeClickable(Vector clickable) {
         ticksSinceReset = 0;
 
-        PersistentDataContainer dataContainer = cube.getPersistentDataContainer();
-        Byte posX = dataContainer.get(new NamespacedKey(getMain(), "board_x"), PersistentDataType.BYTE);
-        Byte posY = dataContainer.get(new NamespacedKey(getMain(), "board_y"), PersistentDataType.BYTE);
+        Byte posX = clickables.get(clickable)[0];
+        Byte posY = clickables.get(clickable)[1];
 
         if (posX != null && posY != null)
             board[posY + (byte) 1][posX + (byte) 1] = getTurn() == Turn.X ? "o" : "x";
 
-        magmaCubes.remove(cube);
-        cube.remove();
+        clickables.remove(clickable);
 
         Winner winner = winCheck(board);
         if (winner != Winner.NOONE) {
@@ -141,56 +145,54 @@ public class GameData {
 
     private void makeMove() {
 
-        if (magmaCubes.isEmpty())
+        if (clickables.isEmpty())
             return;
 
-        Map<MagmaCube, String[][]> neutralMoves = new HashMap<>();
+        Map<Vector, String[][]> neutralMoves = new HashMap<>();
 
-        for (MagmaCube cube : magmaCubes) {
+        for (Vector clickable : clickables.keySet()) {
 
             String[][] newBoard = Arrays.stream(board).map(String[]::clone).toArray(String[][]::new);
 
-            PersistentDataContainer dataContainer = cube.getPersistentDataContainer();
-            Byte posX = dataContainer.get(new NamespacedKey(getMain(), "board_x"), PersistentDataType.BYTE);
-            Byte posY = dataContainer.get(new NamespacedKey(getMain(), "board_y"), PersistentDataType.BYTE);
+            Byte posX = clickables.get(clickable)[0];
+            Byte posY = clickables.get(clickable)[1];
 
             if (posX != null && posY != null)
                 newBoard[posY + (byte) 1][posX + (byte) 1] = "o";
 
             Winner winner = winCheck(newBoard);
             if (winner == Winner.OPPONENT) {
-                opponent.teleport(opponent.getLocation().setDirection(cube.getLocation().subtract(opponent.getEyeLocation()).toVector()));
-                BoardManager.clicked(cube, this);
+                opponent.teleport(opponent.getLocation().setDirection(clickable.toLocation(opponent.getWorld()).subtract(opponent.getEyeLocation()).toVector()));
+                BoardManager.clicked(clickable, this);
                 return;
             }
 
-            neutralMoves.put(cube, newBoard);
+            neutralMoves.put(clickable, newBoard);
 
         }
 
-        for (MagmaCube cube : neutralMoves.keySet()) {
-            String[][] newBoard = Arrays.stream(neutralMoves.get(cube)).map(String[]::clone).toArray(String[][]::new);
+        for (Vector clickable : neutralMoves.keySet()) {
+            String[][] newBoard = Arrays.stream(neutralMoves.get(clickable)).map(String[]::clone).toArray(String[][]::new);
 
-            PersistentDataContainer dataContainer = cube.getPersistentDataContainer();
-            Byte posX = dataContainer.get(new NamespacedKey(getMain(), "board_x"), PersistentDataType.BYTE);
-            Byte posY = dataContainer.get(new NamespacedKey(getMain(), "board_y"), PersistentDataType.BYTE);
+            Byte posX = clickables.get(clickable)[0];
+            Byte posY = clickables.get(clickable)[1];
 
             if (posX != null && posY != null)
                 newBoard[posY + (byte) 1][posX + (byte) 1] = "x";
 
             Winner winner = winCheck(newBoard);
             if (winner == Winner.CHALLENGER) {
-                opponent.teleport(opponent.getLocation().setDirection(cube.getLocation().subtract(opponent.getEyeLocation()).toVector()));
-                BoardManager.clicked(cube, this);
+                opponent.teleport(opponent.getLocation().setDirection(clickable.toLocation(opponent.getWorld()).subtract(opponent.getEyeLocation()).toVector()));
+                BoardManager.clicked(clickable, this);
                 return;
             }
 
         }
 
         int random = new Random().nextInt(neutralMoves.size());
-        MagmaCube cube = new ArrayList<>(neutralMoves.keySet()).get(random);
-        opponent.teleport(opponent.getLocation().setDirection(cube.getLocation().subtract(opponent.getEyeLocation()).toVector()));
-        BoardManager.clicked(cube, this);
+        Vector clickable = new ArrayList<>(neutralMoves.keySet()).get(random);
+        opponent.teleport(opponent.getLocation().setDirection(clickable.toLocation(opponent.getWorld()).subtract(opponent.getEyeLocation()).toVector()));
+        BoardManager.clicked(clickable, this);
 
     }
 
@@ -245,11 +247,6 @@ public class GameData {
     public void startGame() {
         TicTacToe.activeGames.add(this);
 
-        try {
-            TicTacToe.noCollisionTeam.addEntry(challenger.getUniqueId().toString());
-            TicTacToe.noCollisionTeam.addEntry(opponent.getUniqueId().toString());
-        } catch (Exception ignored) { }
-
         taskID = new BukkitRunnable() {
             @Override
             public void run() {
@@ -261,6 +258,9 @@ public class GameData {
                         case O:
                             stand.getWorld().spawnParticle(Particle.FLAME, v.toLocation(stand.getWorld()), 0);
                             break;
+                        case DEBUG:
+                            stand.getWorld().spawnParticle(Particle.BUBBLE_POP, v.toLocation(stand.getWorld()), 0);
+                            break;
                         default:
                             stand.getWorld().spawnParticle(Particle.END_ROD, v.toLocation(stand.getWorld()), 0);
                     }
@@ -269,7 +269,7 @@ public class GameData {
 
                 ticksSinceReset += 6;
 
-                if (magmaCubes.isEmpty() && !isCancelled()) {
+                if (clickables.isEmpty() && !isCancelled() && !gameOver) {
                     queueGameEnd(taskID, Winner.NOONE);
                     cancel();
                 }
@@ -285,14 +285,8 @@ public class GameData {
     }
 
     private void queueGameEnd(int taskID, Winner winner) {
-        for (int i = 0; i < magmaCubes.size(); i++) {
-            try {
-                TicTacToe.noCollisionTeam.removeEntry(magmaCubes.get(i).getUniqueId().toString());
-                TicTacToe.noCollisionTeam.removeEntry(challenger.getName());
-                TicTacToe.noCollisionTeam.removeEntry(opponent.getName());
-            } catch (Exception ignored) { }
-            magmaCubes.get(i).remove();
-        }
+        gameOver = true;
+        clickables.clear();
 
         if (winner.equals(Winner.CHALLENGER)) {
             challenger.sendMessage(ChatColor.GREEN + "You won!");
@@ -302,6 +296,8 @@ public class GameData {
             if (opponent instanceof Player)
                 SoundManager.playSound((Player) opponent, Sound.ENTITY_PLAYER_HURT);
 
+            RewardManager.giveReward(this, winner);
+
         } else if (winner.equals(Winner.OPPONENT)) {
             challenger.sendMessage(ChatColor.RED + "You lost!");
             SoundManager.playSound(challenger, Sound.ENTITY_PLAYER_HURT);
@@ -309,6 +305,8 @@ public class GameData {
             opponent.sendMessage(ChatColor.GREEN + "You won!");
             if (opponent instanceof Player)
                 SoundManager.playSound((Player) opponent, Sound.ENTITY_PLAYER_LEVELUP);
+
+            RewardManager.giveReward(this, winner);
 
         } else {
             challenger.sendMessage(ChatColor.YELLOW + "You tied!");
@@ -328,15 +326,6 @@ public class GameData {
     public void endGame() {
         TicTacToe.activeGames.remove(this);
         if (AI) opponent.setAI(opponentOldAIState);
-
-        for (int i = 0; i < magmaCubes.size(); i++) {
-            try {
-                TicTacToe.noCollisionTeam.removeEntry(magmaCubes.get(i).getUniqueId().toString());
-                TicTacToe.noCollisionTeam.removeEntry(challenger.getUniqueId().toString());
-                TicTacToe.noCollisionTeam.removeEntry(opponent.getUniqueId().toString());
-            } catch (Exception ignored) { }
-            magmaCubes.get(i).remove();
-        }
 
         stand.remove();
     }

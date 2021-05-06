@@ -11,8 +11,12 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.Objects;
@@ -25,7 +29,7 @@ public class onPlayerInteractEvent implements Listener {
         if (!(e.getRightClicked() instanceof LivingEntity))
             return;
 
-        if (Objects.equals(e.getRightClicked().getCustomName(), "tictactoe_clickable"))
+        if (!e.getHand().equals(EquipmentSlot.HAND))
             return;
 
         Player player = e.getPlayer();
@@ -89,14 +93,7 @@ public class onPlayerInteractEvent implements Listener {
     }
 
     @EventHandler
-    public void onPlayerRightClickMagmaCube(PlayerInteractAtEntityEvent e) {
-
-        if (!(e.getRightClicked() instanceof MagmaCube))
-            return;
-
-        if (!Objects.equals(e.getRightClicked().getCustomName(), "tictactoe_clickable"))
-            return;
-
+    public void onRightClick(PlayerInteractEvent e) {
         ItemStack heldItem = e.getPlayer().getInventory().getItemInMainHand();
 
         if (!heldItem.hasItemMeta())
@@ -105,12 +102,18 @@ public class onPlayerInteractEvent implements Listener {
         if (!Objects.equals(heldItem.getItemMeta(), TicTacToe.getChallengeItem().getItemMeta()))
             return;
 
+        if (!e.getHand().equals(EquipmentSlot.HAND))
+            return;
+
         GameData game = TicTacToe.activeGames.stream()
-                .filter(g -> g.getMagmaCubes().contains((MagmaCube) e.getRightClicked()))
+                .filter(g -> g.getChallenger().equals(e.getPlayer()) || g.getOpponent().equals(e.getPlayer()))
                 .findFirst()
                 .orElse(null);
 
         if (game == null)
+            return;
+
+        if (game.isPreGame())
             return;
 
         if (!game.getAI()) {
@@ -124,10 +127,15 @@ public class onPlayerInteractEvent implements Listener {
         }
 
         if (e.getPlayer().equals(game.getChallenger()) || e.getPlayer().equals(game.getOpponent())) {
-            SoundManager.playSound(e.getPlayer(), Sound.BLOCK_STONE_BUTTON_CLICK_ON);
-            BoardManager.clicked((MagmaCube) e.getRightClicked(), game);
+            Vector clickable = BoardManager.getClickable(e.getPlayer(), game);
+
+            if (clickable != null) {
+                SoundManager.playSound(e.getPlayer(), Sound.BLOCK_STONE_BUTTON_CLICK_ON);
+                BoardManager.clicked(clickable, game);
+            }
         }
 
     }
+
 
 }
