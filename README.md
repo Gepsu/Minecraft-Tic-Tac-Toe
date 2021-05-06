@@ -5,8 +5,9 @@ A Tic Tac Toe plugin for Minecraft Spigot using particles.
 
 ## Features
 - Automatically checks for winner after every turn
-- You can play with animals and villagers with super advanced "AI" !!
+- You can play with animals and villagers with "super advanced AI" !!
 - Automatically resets the board if you walk too far or if a player quits
+- You can set rewards in the config file! Examples included
 - Sounds!
 
 ## Commands
