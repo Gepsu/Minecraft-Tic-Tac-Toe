@@ -61,8 +61,20 @@ public class onPlayerInteractEvent implements Listener {
             if (found == null)
                 return;
         } else {
+            // Is a player
             if (!opponent.hasPermission("ttt.play")) {
                 player.sendMessage(ChatColor.RED + "They don't have a permission to play.");
+                return;
+            }
+
+            ItemStack opponentItem = ((Player) opponent).getInventory().getItemInMainHand();
+            if (!opponentItem.hasItemMeta()) {
+                player.sendMessage(ChatColor.RED + "They are not holding a StickTacToe");
+                return;
+            }
+
+            if (!Objects.equals(opponentItem.getItemMeta(), TicTacToe.getChallengeItem().getItemMeta())) {
+                player.sendMessage(ChatColor.RED + "They are not holding a StickTacToe");
                 return;
             }
         }
