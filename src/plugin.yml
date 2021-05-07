@@ -1,8 +1,10 @@
 name: TicTacToe
 api-version: 1.16
-version: 1.2
+version: 1.3
 author: ItsGeppy
 main: its.geppy.tictactoe.TicTacToe
+softdepend:
+  - Essentials
 commands:
   tictactoe:
     aliases: ["ttt"]

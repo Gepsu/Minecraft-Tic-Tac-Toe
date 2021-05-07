@@ -3,15 +3,11 @@ package its.geppy.tictactoe.Listeners;
 import its.geppy.tictactoe.TicTacToe;
 import its.geppy.tictactoe.Utilities.BoardManager;
 import its.geppy.tictactoe.Utilities.GameData;
-import its.geppy.tictactoe.Utilities.SoundManager;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import its.geppy.tictactoe.Commands.SoundCommands;
 import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -36,7 +32,7 @@ public class onPlayerInteractEvent implements Listener {
         ItemStack heldItem = player.getInventory().getItemInMainHand();
 
         if (!player.hasPermission("ttt.play")) {
-            player.sendMessage(ChatColor.RED + "You don't have a permission to play.");
+            player.sendMessage(TicTacToe.getStringInConfig("you-dont-have-permission"));
             return;
         }
 
@@ -63,18 +59,18 @@ public class onPlayerInteractEvent implements Listener {
         } else {
             // Is a player
             if (!opponent.hasPermission("ttt.play")) {
-                player.sendMessage(ChatColor.RED + "They don't have a permission to play.");
+                player.sendMessage(TicTacToe.getStringInConfig("other-player-doesnt-have-permission"));
                 return;
             }
 
             ItemStack opponentItem = ((Player) opponent).getInventory().getItemInMainHand();
             if (!opponentItem.hasItemMeta()) {
-                player.sendMessage(ChatColor.RED + "They are not holding a StickTacToe");
+                player.sendMessage(TicTacToe.getStringInConfig("other-player-not-holding-the-item"));
                 return;
             }
 
             if (!Objects.equals(opponentItem.getItemMeta(), TicTacToe.getChallengeItem().getItemMeta())) {
-                player.sendMessage(ChatColor.RED + "They are not holding a StickTacToe");
+                player.sendMessage(TicTacToe.getStringInConfig("other-player-not-holding-the-item"));
                 return;
             }
         }
@@ -96,11 +92,11 @@ public class onPlayerInteractEvent implements Listener {
         }))
             return;
 
-        SoundManager.playSound(player, Sound.BLOCK_BELL_RESONATE);
+        SoundCommands.playSound(player, Sound.BLOCK_BELL_RESONATE);
         if (opponent instanceof Player)
-            SoundManager.playSound((Player) opponent, Sound.BLOCK_BELL_RESONATE);
+            SoundCommands.playSound((Player) opponent, Sound.BLOCK_BELL_RESONATE);
 
-        BoardManager.buildBoard(player, opponent);
+        BoardManager.buildBoard(player, opponent, 0);
 
     }
 
@@ -142,7 +138,7 @@ public class onPlayerInteractEvent implements Listener {
             Vector clickable = BoardManager.getClickable(e.getPlayer(), game);
 
             if (clickable != null) {
-                SoundManager.playSound(e.getPlayer(), Sound.BLOCK_STONE_BUTTON_CLICK_ON);
+                SoundCommands.playSound(e.getPlayer(), Sound.BLOCK_STONE_BUTTON_CLICK_ON);
                 BoardManager.clicked(clickable, game);
             }
         }

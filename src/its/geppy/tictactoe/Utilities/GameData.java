@@ -1,9 +1,9 @@
 package its.geppy.tictactoe.Utilities;
 
+import its.geppy.tictactoe.Commands.SoundCommands;
 import its.geppy.tictactoe.TicTacToe;
 import org.bukkit.*;
 import org.bukkit.entity.*;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -11,6 +11,7 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 import static its.geppy.tictactoe.TicTacToe.getMain;
+import static its.geppy.tictactoe.TicTacToe.getStringInConfig;
 
 public class GameData {
 
@@ -27,6 +28,11 @@ public class GameData {
     private final Player challenger;
     private final LivingEntity opponent;
     private final boolean opponentOldAIState;
+
+    private final Particle challengerParticles;
+    private final Particle opponentParticles;
+
+    private final long bet;
 
     private int ticksSinceReset = 0;
 
@@ -59,12 +65,13 @@ public class GameData {
         NOONE
     }
 
-    public GameData(ArmorStand stand, Map<Vector, ParticleJob> particleMap, Player challenger, LivingEntity opponent) {
+    public GameData(ArmorStand stand, Map<Vector, ParticleJob> particleMap, Player challenger, LivingEntity opponent, long bet) {
         this.stand = stand;
         this.particleMap = particleMap;
         this.origin = stand.getLocation().clone().add(0, 1, 0).toVector();
         this.challenger = challenger;
         this.opponent = opponent;
+        this.bet = bet;
         this.AI = !(opponent instanceof Player);
 
         opponentOldAIState = opponent.hasAI();
@@ -73,6 +80,17 @@ public class GameData {
         Location tempDirection = stand.getLocation().clone();
         tempDirection.setPitch(0);
         this.direction = tempDirection.getDirection().normalize();
+
+        String challengerOverrideParticles = challenger.getPersistentDataContainer().get(new NamespacedKey(getMain(), "ttt_particles"), PersistentDataType.STRING);
+        String opponentOverrideParticles = (!AI) ? opponent.getPersistentDataContainer().get(new NamespacedKey(getMain(), "ttt_particles"), PersistentDataType.STRING) : null;
+
+        if (getMain().getConfig().getBoolean("allow-player-particles")) {
+            challengerParticles = challengerOverrideParticles == null ? Particle.valueOf(getStringInConfig("player1-particles")) : Particle.valueOf(challengerOverrideParticles);
+            opponentParticles = opponentOverrideParticles == null ? Particle.valueOf(getStringInConfig("player2-particles")) : Particle.valueOf(opponentOverrideParticles);
+        } else {
+            challengerParticles = Particle.valueOf(getStringInConfig("player1-particles"));
+            opponentParticles = Particle.valueOf(getStringInConfig("player2-particles"));
+        }
 
         clickables = new HashMap<>();
 
@@ -95,6 +113,8 @@ public class GameData {
     public Turn getTurn() {
         return turn;
     }
+
+    public long getBetAmount() { return bet; }
 
     public Player getChallenger() {
         return challenger;
@@ -252,17 +272,14 @@ public class GameData {
             public void run() {
                 for (Vector v : particleMap.keySet()) {
                     switch (particleMap.get(v)) {
-                        case X:
-                            stand.getWorld().spawnParticle(Particle.COMPOSTER, v.toLocation(stand.getWorld()), 5);
-                            break;
                         case O:
-                            stand.getWorld().spawnParticle(Particle.FLAME, v.toLocation(stand.getWorld()), 0);
+                            stand.getWorld().spawnParticle(challengerParticles, v.toLocation(stand.getWorld()), 0);
                             break;
-                        case DEBUG:
-                            stand.getWorld().spawnParticle(Particle.BUBBLE_POP, v.toLocation(stand.getWorld()), 0);
+                        case X:
+                            stand.getWorld().spawnParticle(opponentParticles, v.toLocation(stand.getWorld()), 0);
                             break;
                         default:
-                            stand.getWorld().spawnParticle(Particle.END_ROD, v.toLocation(stand.getWorld()), 0);
+                            stand.getWorld().spawnParticle(Particle.valueOf(getStringInConfig("frame-particles")), v.toLocation(stand.getWorld()), 0);
                     }
 
                 }
@@ -274,9 +291,23 @@ public class GameData {
                     cancel();
                 }
 
-                if (origin.distance(challenger.getLocation().toVector()) > TicTacToe.maxDistanceFromBoard ||
-                        origin.distance(opponent.getLocation().toVector()) > TicTacToe.maxDistanceFromBoard ||
-                        stand.isDead() || ticksSinceReset > TicTacToe.maxIdleTime) {
+                if (origin.distance(challenger.getLocation().toVector()) > TicTacToe.maxDistanceFromBoard) {
+                    queueGameEnd(taskID, Winner.OPPONENT);
+                    cancel();
+                }
+
+                if (origin.distance(opponent.getLocation().toVector()) > TicTacToe.maxDistanceFromBoard) {
+                    queueGameEnd(taskID, Winner.CHALLENGER);
+                    cancel();
+                }
+
+                if (ticksSinceReset > TicTacToe.maxIdleTime) {
+                    queueGameEnd(taskID, turn == Turn.O ? Winner.CHALLENGER : Winner.OPPONENT);
+                    cancel();
+                }
+
+                if (stand.isDead()) {
+                    RewardManager.refundBets(GameData.this);
                     endGame();
                     cancel();
                 }
@@ -289,32 +320,34 @@ public class GameData {
         clickables.clear();
 
         if (winner.equals(Winner.CHALLENGER)) {
-            challenger.sendMessage(ChatColor.GREEN + "You won!");
-            SoundManager.playSound(challenger, Sound.ENTITY_PLAYER_LEVELUP);
+            challenger.sendMessage(TicTacToe.getStringInConfig("win-message"));
+            SoundCommands.playSound(challenger, Sound.ENTITY_PLAYER_LEVELUP);
 
-            opponent.sendMessage(ChatColor.RED + "You lost!");
+            opponent.sendMessage(TicTacToe.getStringInConfig("lose-message"));
             if (opponent instanceof Player)
-                SoundManager.playSound((Player) opponent, Sound.ENTITY_PLAYER_HURT);
+                SoundCommands.playSound((Player) opponent, Sound.ENTITY_PLAYER_HURT);
 
             RewardManager.giveReward(this, winner);
 
         } else if (winner.equals(Winner.OPPONENT)) {
-            challenger.sendMessage(ChatColor.RED + "You lost!");
-            SoundManager.playSound(challenger, Sound.ENTITY_PLAYER_HURT);
+            challenger.sendMessage(TicTacToe.getStringInConfig("lose-message"));
+            SoundCommands.playSound(challenger, Sound.ENTITY_PLAYER_HURT);
 
-            opponent.sendMessage(ChatColor.GREEN + "You won!");
+            opponent.sendMessage(TicTacToe.getStringInConfig("win-message"));
             if (opponent instanceof Player)
-                SoundManager.playSound((Player) opponent, Sound.ENTITY_PLAYER_LEVELUP);
+                SoundCommands.playSound((Player) opponent, Sound.ENTITY_PLAYER_LEVELUP);
 
             RewardManager.giveReward(this, winner);
 
         } else {
-            challenger.sendMessage(ChatColor.YELLOW + "You tied!");
-            opponent.sendMessage(ChatColor.YELLOW + "You tied!");
+            challenger.sendMessage(TicTacToe.getStringInConfig("tie-message"));
+            opponent.sendMessage(TicTacToe.getStringInConfig("tie-message"));
 
-            SoundManager.playSound(challenger, Sound.ENTITY_PLAYER_BREATH);
+            RewardManager.refundBets(this);
+
+            SoundCommands.playSound(challenger, Sound.ENTITY_PLAYER_BREATH);
             if (opponent instanceof Player)
-                SoundManager.playSound((Player) opponent, Sound.ENTITY_PLAYER_BREATH);
+                SoundCommands.playSound((Player) opponent, Sound.ENTITY_PLAYER_BREATH);
         }
 
         Bukkit.getScheduler().runTaskLater(getMain(), () -> {

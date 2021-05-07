@@ -17,5 +17,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="spigot-1.16.5" level="application" />
+    <orderEntry type="library" name="EssentialsX-2.18.2.0" level="application" />
   </component>
 </module>

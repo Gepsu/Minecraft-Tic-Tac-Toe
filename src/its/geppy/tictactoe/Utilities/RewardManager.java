@@ -1,14 +1,18 @@
 package its.geppy.tictactoe.Utilities;
 
+import its.geppy.tictactoe.TicTacToe;
+import net.ess3.api.MaxMoneyException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static its.geppy.tictactoe.TicTacToe.getEssentials;
 import static its.geppy.tictactoe.TicTacToe.getMain;
 
 public class RewardManager {
@@ -17,9 +21,23 @@ public class RewardManager {
 
     public static void giveReward(GameData game, GameData.Winner winner) {
 
+        LivingEntity winnerEntity = (winner == GameData.Winner.CHALLENGER) ? game.getChallenger() : game.getOpponent();
+        LivingEntity loserEntity = (winner != GameData.Winner.CHALLENGER) ? game.getChallenger() : game.getOpponent();
+
+        if (getEssentials() != null && game.getBetAmount() != 0) {
+            Player winnerPlayer = (Player) winnerEntity;
+            try {
+                getEssentials().getUser(winnerPlayer).setMoney(getEssentials().getUser(winnerPlayer).getMoney().add(BigDecimal.valueOf(game.getBetAmount() * 2)));
+            } catch (MaxMoneyException e) {
+                winnerPlayer.sendMessage(ChatColor.RED + "You've reached max money!");
+            }
+
+            return;
+        }
+
         if (limitReached(game)) {
-            game.getChallenger().sendMessage(ChatColor.YELLOW + "Reward limit reached");
-            game.getOpponent().sendMessage(ChatColor.YELLOW + "Reward limit reached");
+            game.getChallenger().sendMessage(TicTacToe.getStringInConfig("reward-limit-reached"));
+            game.getOpponent().sendMessage(TicTacToe.getStringInConfig("reward-limit-reached"));
             return;
         }
 
@@ -58,9 +76,6 @@ public class RewardManager {
 
         String winnerReward = getMain().getConfig().getString("rewards." + opponentType + "." + randomReward + ".winner");
         String loserReward = getMain().getConfig().getString("rewards." + opponentType + "." + randomReward + ".loser");
-
-        LivingEntity winnerEntity = (winner == GameData.Winner.CHALLENGER) ? game.getChallenger() : game.getOpponent();
-        LivingEntity loserEntity = (winner != GameData.Winner.CHALLENGER) ? game.getChallenger() : game.getOpponent();
 
         if (winnerReward != null && winnerEntity instanceof Player) {
             winnerReward = winnerReward.replaceAll("\\$winner", winnerEntity.getName());
@@ -131,6 +146,20 @@ public class RewardManager {
                 .filter(g -> (g.player1.equals(game.getChallenger().getUniqueId()) || g.player2.equals(game.getChallenger().getUniqueId())) &&
                              (g.player1.equals(game.getOpponent().getUniqueId()) || g.player2.equals(game.getOpponent().getUniqueId())))
                 .findFirst();
+
+    }
+
+    public static void refundBets(GameData game) {
+
+        if (getEssentials() != null && game.getBetAmount() != 0) {
+            try {
+                if (game.getOpponent() instanceof Player)
+                    getEssentials().getUser((Player)game.getOpponent()).setMoney(getEssentials().getUser((Player)game.getOpponent()).getMoney().add(BigDecimal.valueOf(game.getBetAmount())));
+
+                getEssentials().getUser(game.getChallenger()).setMoney(getEssentials().getUser(game.getChallenger()).getMoney().add(BigDecimal.valueOf(game.getBetAmount())));
+            } catch (MaxMoneyException e) { }
+
+        }
 
     }
 

@@ -1,11 +1,11 @@
 package its.geppy.tictactoe.Commands;
 
-import its.geppy.tictactoe.Utilities.SoundManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Method;
@@ -13,12 +13,21 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static its.geppy.tictactoe.TicTacToe.getEssentials;
+import static its.geppy.tictactoe.TicTacToe.getMain;
+
 public class AllCommands implements CommandExecutor, TabCompleter {
 
     Map<String, String> commandList = new HashMap<String, String>() {{
         put("play", "ttt.play");
         put("sounds off", "ttt.play");
         put("sounds on", "ttt.play");
+        if (getMain().getConfig().getBoolean("essentials-support") && getEssentials() != null) put("challenge player $playerList", "ttt.play");
+        if (getMain().getConfig().getBoolean("essentials-support") && getEssentials() != null) put("challenge accept $acceptableChallenges", "ttt.play");
+        if (getMain().getConfig().getBoolean("essentials-support") && getEssentials() != null) put("challenge cancel $cancellableChallenges", "ttt.play");
+        if (getMain().getConfig().getBoolean("allow-player-particles")) put("particles change $particleList", "ttt.particles.change");
+        if (getMain().getConfig().getBoolean("allow-player-particles")) put("particles reset $playerList", "ttt.particles.reset.admin");
+        if (getMain().getConfig().getBoolean("allow-player-particles")) put("particles reset", "ttt.particles.reset");
     }};
 
     @Override
@@ -40,10 +49,25 @@ public class AllCommands implements CommandExecutor, TabCompleter {
                 ChallengeStick.spawnItem(player);
                 break;
             case "sounds on":
-                SoundManager.soundOn(player);
+                SoundCommands.soundOn(player);
                 break;
             case "sounds off":
-                SoundManager.soundOff(player);
+                SoundCommands.soundOff(player);
+                break;
+            case "particles change":
+                ParticleCommands.changeParticles(player, args);
+                break;
+            case "particles reset":
+                ParticleCommands.reset(player, args);
+                break;
+            case "challenge player":
+                ChallengeCommand.challenge(player, args);
+                break;
+            case "challenge accept":
+                ChallengeCommand.acceptChallenge(player, args);
+                break;
+            case "challenge cancel":
+                ChallengeCommand.cancelChallenge(player, args);
                 break;
             case "no_permission":
                 player.sendMessage(ChatColor.RED + "No permission.");
@@ -118,8 +142,8 @@ public class AllCommands implements CommandExecutor, TabCompleter {
 
             if (currentArg.startsWith("$")) {
                 try {
-                    Method method = getClass().getDeclaredMethod(currentArg.replace("$", ""), List.class);
-                    invokeReturns = (List<String>) method.invoke(this, Arrays.asList(args));
+                    Method method = getClass().getDeclaredMethod(currentArg.replace("$", ""), Player.class, List.class);
+                    invokeReturns = (List<String>) method.invoke(this, player, Arrays.asList(args));
                 } catch (Exception e) { e.printStackTrace();}
             } else
                 returnList.add(currentArg);
@@ -135,7 +159,27 @@ public class AllCommands implements CommandExecutor, TabCompleter {
         return returnList;
     }
 
-    //private List<String> getCollections(List<String> args) {
-    //    return new ArrayList<>(getMain().getCollectionsYML().getKeys(false));
-    //}
+    private List<String> particleList(Player player, List<String> args) {
+        return getMain().getConfig().getStringList("player-particles");
+    }
+
+    private List<String> playerList(Player player, List<String> args) {
+        return getMain().getServer().getOnlinePlayers().stream()
+                .filter(p -> !p.equals(player))
+                .map(HumanEntity::getName).collect(Collectors.toList());
+    }
+
+    private List<String> cancellableChallenges(Player player, List<String> args) {
+        return ChallengeCommand.getActiveChallenges().stream()
+                .filter(c -> c.challenger.equals(player) || c.opponent.equals(player))
+                .map(c -> c.opponent.equals(player) ? c.challenger.getName() : c.opponent.getName())
+                .collect(Collectors.toList());
+    }
+
+    private List<String> acceptableChallenges(Player player, List<String> args) {
+        return ChallengeCommand.getActiveChallenges().stream()
+                .filter(c -> c.opponent.equals(player))
+                .map(c -> c.challenger.getName())
+                .collect(Collectors.toList());
+    }
 }

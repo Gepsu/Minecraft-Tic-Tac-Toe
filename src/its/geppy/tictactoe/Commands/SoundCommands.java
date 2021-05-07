@@ -1,4 +1,4 @@
-package its.geppy.tictactoe.Utilities;
+package its.geppy.tictactoe.Commands;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -9,7 +9,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import static its.geppy.tictactoe.TicTacToe.getMain;
 
-public class SoundManager {
+public class SoundCommands {
 
     public static void playSound(Player player, Sound sound) {
 

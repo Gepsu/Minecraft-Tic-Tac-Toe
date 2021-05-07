@@ -6,13 +6,15 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
+import static its.geppy.tictactoe.TicTacToe.getMain;
+
 public class BoardManager {
 
     final static double boardSize = 3;
     final static double particleStep = 0.25;
     final static double thickness = 0.02;
 
-    public static void buildBoard(Player player, LivingEntity opponent) {
+    public static void buildBoard(Player player, LivingEntity opponent, long bet) {
         Location center = player.getEyeLocation().add(opponent.getEyeLocation()).multiply(.5).subtract(0, boardSize/2, 0);
 
         ArmorStand stand = center.getWorld().spawn(center.clone().add(0, -1, 0), ArmorStand.class, (setting) -> {
@@ -25,7 +27,7 @@ public class BoardManager {
 
         Map<Vector, GameData.ParticleJob> particleMap = new HashMap<>();
 
-        GameData game = new GameData(stand, particleMap, player, opponent);
+        GameData game = new GameData(stand, particleMap, player, opponent, bet);
 
         // Frame
         for (double x = -(boardSize/2); x < boardSize/2; x += particleStep) {
@@ -76,8 +78,8 @@ public class BoardManager {
         for (int x = 0; x < 5; x++) {
             for (int y = 0; y < 5; y++) {
 
-                String current = shape.get(x + y * 5);
-                if (current.equals(""))
+                char current = shape.get(y).toCharArray()[x];
+                if (current == '-')
                     continue;
 
                 double dx = (x - 2) * (boardSize * 0.04);
@@ -94,23 +96,11 @@ public class BoardManager {
     }
 
     private static List<String> xShape() {
-        return Arrays.asList(
-                "x", "", "", "", "x",
-                "", "x", "", "x", "",
-                "", "", "x", "", "",
-                "", "x", "", "x", "",
-                "x", "", "", "", "x"
-        );
+        return getMain().getConfig().getStringList("player1-shape");
     }
 
     private static List<String> oShape() {
-        return Arrays.asList(
-                "", "x", "x", "x", "",
-                "x", "", "", "", "x",
-                "x", "", "", "", "x",
-                "x", "", "", "", "x",
-                "", "x", "x", "x", ""
-        );
+        return getMain().getConfig().getStringList("player2-shape");
     }
 
     public static Vector getClickable(Player player, GameData game) {

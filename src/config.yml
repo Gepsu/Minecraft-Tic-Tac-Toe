@@ -10,6 +10,64 @@ maximum-idle-time-in-seconds: 30
 # Removes the board if players walk too far away from it
 maximum-distance-from-board: 7
 
+# Allows players to bet on their games
+essentials-support: true
+
+# Allow players to change their particles. true/false
+allow-player-particles: true
+
+# List of particles players are allowed to pick
+# Particle list can be found here:
+# https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+player-particles:
+  - FLAME
+  - COMPOSTER
+  - BUBBLE_POP
+
+# Default particles
+frame-particles: END_ROD
+player1-particles: FLAME
+player2-particles: COMPOSTER
+
+# Particle shapes
+player1-shape:
+  - "x---x"
+  - "-x-x-"
+  - "--x--"
+  - "-x-x-"
+  - "x---x"
+player2-shape:
+  - "-xxx-"
+  - "x---x"
+  - "x---x"
+  - "x---x"
+  - "-xxx-"
+
+# The stick's name
+item-name: "&6&lStick&f&lTac&6&lToe"
+
+# Chat Messages
+win-message: "&aYou won!"
+lose-message: "&cYou lost!"
+tie-message: "&eYou tied!"
+reward-limit-reached: "&eReward limit reached!"
+you-dont-have-permission: "&cYou don't have a permission to play."
+other-player-doesnt-have-permission: "&cThey don't have a permission to play."
+other-player-not-holding-the-item: "&cThey are not holding a StickTacToe."
+invalid-particle-type: "&cInvalid particle type."
+invalid-player-name: "&cInvalid player name."
+invalid-bet-amount: "&cInvalid bet amount."
+cant-challenge-yourself: "&cYou can't challenge yourself!"
+player-too-far: "&cYou're too far from the other player."
+you-dont-have-enough-money: "&cYou don't have enough money."
+other-player-doesnt-have-enough-money: "&cThey don't have enough money."
+you-challenged-player: "&eYou challenged &6$player&e to a TicTacToe game with a bet of &6$$bet&e."
+player-challenged-you: "&eYou were challenged by &6$player&e to a TicTacToe game with a bet of &6$$bet&e!"
+cancel-button: "&c&l[CANCEL]"
+deny-button: "&c&l[DENY]"
+accept-button: "&a&l[ACCEPT]"
+cancelled-challenge: "&aChallenge against &2$player&a was cancelled."
+
 # List of entities player can play against. PLAYER automatically included!
 # Entity types can be found here:
 # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
