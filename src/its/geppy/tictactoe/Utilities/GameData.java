@@ -116,6 +116,8 @@ public class GameData {
 
     public long getBetAmount() { return bet; }
 
+    public int getTaskID() { return taskID; }
+
     public Player getChallenger() {
         return challenger;
     }
@@ -315,7 +317,7 @@ public class GameData {
         }.runTaskTimer(getMain(), 0, 6).getTaskId();
     }
 
-    private void queueGameEnd(int taskID, Winner winner) {
+    public void queueGameEnd(int taskID, Winner winner) {
         gameOver = true;
         clickables.clear();
 
