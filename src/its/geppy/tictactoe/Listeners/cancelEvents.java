@@ -6,8 +6,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Objects;
-
 public class cancelEvents implements Listener {
 
     @EventHandler
@@ -15,9 +13,8 @@ public class cancelEvents implements Listener {
 
         ItemStack heldItem = e.getPlayer().getInventory().getItemInMainHand();
 
-        if (heldItem.hasItemMeta())
-            if (Objects.equals(heldItem.getItemMeta(), TicTacToe.getChallengeItem().getItemMeta()))
-                e.setCancelled(true);
+        if (heldItem.isSimilar(TicTacToe.getToolItem()))
+            e.setCancelled(true);
 
 
     }

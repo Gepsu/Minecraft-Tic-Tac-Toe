@@ -15,7 +15,7 @@ public class ToolCommand {
 
     public static void spawnItem(Player player) {
 
-        if (player.getInventory().contains(TicTacToe.getChallengeItem())) {
+        if (player.getInventory().contains(TicTacToe.getToolItem())) {
             player.sendMessage(TicTacToe.getStringInConfig("tool-already-in-inventory"));
             return;
         }
@@ -26,12 +26,12 @@ public class ToolCommand {
         }
 
         if (player.getInventory().getItemInMainHand().getType().equals(Material.AIR)) {
-            player.getInventory().setItemInMainHand(TicTacToe.getChallengeItem());
+            player.getInventory().setItemInMainHand(TicTacToe.getToolItem());
             setCooldown(player);
             return;
         }
 
-        player.getInventory().addItem(TicTacToe.getChallengeItem());
+        player.getInventory().addItem(TicTacToe.getToolItem());
         setCooldown(player);
 
     }

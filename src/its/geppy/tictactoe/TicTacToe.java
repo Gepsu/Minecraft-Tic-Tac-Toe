@@ -30,6 +30,8 @@ public class TicTacToe extends JavaPlugin implements CommandExecutor {
     public static int maxIdleTime;
     public static int maxDistanceFromBoard;
 
+    private static ItemStack tool;
+
     @Override
     public void onEnable() {
 
@@ -48,6 +50,8 @@ public class TicTacToe extends JavaPlugin implements CommandExecutor {
         maxIdleTime = getMain().getConfig().getInt("maximum-idle-time-in-seconds") * 20;
         maxDistanceFromBoard = getMain().getConfig().getInt("maximum-distance-from-board");
 
+        setToolItem();
+
     }
 
     @Override
@@ -61,22 +65,24 @@ public class TicTacToe extends JavaPlugin implements CommandExecutor {
 
     }
 
-    public static ItemStack getChallengeItem() {
+    private static void setToolItem() {
         String materialString = getMain().getConfig().getString("item-material");
         if (materialString == null) materialString = "STICK";
 
         Material itemMaterial = Material.getMaterial(materialString);
-        ItemStack stickTacToe = new ItemStack(itemMaterial, 1);
-        ItemMeta meta = stickTacToe.getItemMeta();
+        tool = new ItemStack(itemMaterial, 1);
+        ItemMeta meta = tool.getItemMeta();
         meta.setDisplayName(getStringInConfig("item-name"));
         List<String> lore = getMain().getConfig().getStringList("item-lore");
         lore = lore.stream()
                 .map(l -> ChatColor.translateAlternateColorCodes('&', l))
                 .collect(Collectors.toList());
         meta.setLore(lore);
-        stickTacToe.setItemMeta(meta);
+        tool.setItemMeta(meta);
+    }
 
-        return stickTacToe;
+    public static ItemStack getToolItem() {
+        return tool;
     }
 
     public static Essentials getEssentials() {

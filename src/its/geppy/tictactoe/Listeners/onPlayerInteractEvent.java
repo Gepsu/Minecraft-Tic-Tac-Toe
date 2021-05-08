@@ -36,10 +36,7 @@ public class onPlayerInteractEvent implements Listener {
             return;
         }
 
-        if (!heldItem.hasItemMeta())
-            return;
-
-        if (!Objects.equals(heldItem.getItemMeta(), TicTacToe.getChallengeItem().getItemMeta()))
+        if (!heldItem.isSimilar(TicTacToe.getToolItem()))
             return;
 
         double min = TicTacToe.getMain().getConfig().getDouble("minimum-distance-between-boards");
@@ -64,12 +61,7 @@ public class onPlayerInteractEvent implements Listener {
             }
 
             ItemStack opponentItem = ((Player) opponent).getInventory().getItemInMainHand();
-            if (!opponentItem.hasItemMeta()) {
-                player.sendMessage(TicTacToe.getStringInConfig("other-player-not-holding-the-item"));
-                return;
-            }
-
-            if (!Objects.equals(opponentItem.getItemMeta(), TicTacToe.getChallengeItem().getItemMeta())) {
+            if (!opponentItem.isSimilar(TicTacToe.getToolItem())) {
                 player.sendMessage(TicTacToe.getStringInConfig("other-player-not-holding-the-item"));
                 return;
             }
@@ -104,10 +96,7 @@ public class onPlayerInteractEvent implements Listener {
     public void onRightClick(PlayerInteractEvent e) {
         ItemStack heldItem = e.getPlayer().getInventory().getItemInMainHand();
 
-        if (!heldItem.hasItemMeta())
-            return;
-
-        if (!Objects.equals(heldItem.getItemMeta(), TicTacToe.getChallengeItem().getItemMeta()))
+        if (!heldItem.isSimilar(TicTacToe.getToolItem()))
             return;
 
         if (!e.getHand().equals(EquipmentSlot.HAND))
