@@ -15,7 +15,7 @@ A Tic Tac Toe plugin for Minecraft Spigot using particles.
 - Sounds!
 
 ## Commands
-- `/ttt play` - gives you a stick you use to play
+- `/ttt tool` - gives you the tool you use to play
 - `/ttt sounds on/off` - as you might've guessed, turns sounds on and off
 - `/ttt challenge player <player> <betAmount>` - this is how you challenge other players with a bet
 - `/ttt challenge cancel <player>` - cancel challenge for that specific player
@@ -24,8 +24,9 @@ A Tic Tac Toe plugin for Minecraft Spigot using particles.
 - `/ttt particles reset [player]` - resets your own particles back to normal. Admins can reset other players
 
 ## Permissions
-- `ttt.play` - required to play and spawn the stick
-- `ttt.play.nocooldown` - used to bypass the cooldown for getting the stick
+- `ttt.play` - required to play
+- `ttt.tool` - lets players spawn the tool
+- `ttt.tool.nocooldown` - used to bypass the cooldown for getting the tool
 - `ttt.particles.change` - lets players change their particles if enabled in the config files too
 - `ttt.particles.reset` - lets players reset their particles
 - `ttt.particles.reset.admin` - lets admins reset other players
@@ -37,4 +38,4 @@ A Tic Tac Toe plugin for Minecraft Spigot using particles.
 - None that i know of
 
 ## How to play
-Once you have a StickTacToe (/ttt play), just right click a player or entities that have been listed in the config file and you're golden! Default entities include villagers and most of the animals. Walking away from the board or quitting counts as forfeit and you lose the game and bet.
+Once you have the tool (/ttt tool), just right click a player or entities that have been listed in the config file and you're golden! Default entities include villagers and most of the animals. Walking away from the board or quitting counts as forfeit and you lose the game and bet.
