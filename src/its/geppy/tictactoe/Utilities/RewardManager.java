@@ -28,11 +28,11 @@ public class RewardManager {
             Player winnerPlayer = (Player) winnerEntity;
             try {
                 getEssentials().getUser(winnerPlayer).setMoney(getEssentials().getUser(winnerPlayer).getMoney().add(BigDecimal.valueOf(game.getBetAmount() * 2)));
-            } catch (MaxMoneyException e) {
+            } catch (Exception e) {
                 winnerPlayer.sendMessage(ChatColor.RED + "You've reached max money!");
                 try {
                     getEssentials().getUser(winnerPlayer).setMoney(getEssentials().getSettings().getMaxMoney());
-                } catch (MaxMoneyException ignored) { }
+                } catch (Exception ignored) { }
             }
 
             return;
@@ -160,7 +160,7 @@ public class RewardManager {
                     getEssentials().getUser((Player)game.getOpponent()).setMoney(getEssentials().getUser((Player)game.getOpponent()).getMoney().add(BigDecimal.valueOf(game.getBetAmount())));
 
                 getEssentials().getUser(game.getChallenger()).setMoney(getEssentials().getUser(game.getChallenger()).getMoney().add(BigDecimal.valueOf(game.getBetAmount())));
-            } catch (MaxMoneyException ignored) { }
+            } catch (Exception ignored) { }
 
         }
 

@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class ChallengeStick {
+public class ToolCommand {
 
     private static Map<UUID, LocalDateTime> cooldowns = new HashMap<>();
 

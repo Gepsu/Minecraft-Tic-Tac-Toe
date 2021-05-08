@@ -46,7 +46,7 @@ public class AllCommands implements CommandExecutor, TabCompleter {
         switch(cmd) {
 
             case "tool":
-                ChallengeStick.spawnItem(player);
+                ToolCommand.spawnItem(player);
                 break;
             case "sounds on":
                 SoundCommands.soundOn(player);
