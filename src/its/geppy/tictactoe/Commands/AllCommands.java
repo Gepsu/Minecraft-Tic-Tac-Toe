@@ -19,7 +19,7 @@ import static its.geppy.tictactoe.TicTacToe.getMain;
 public class AllCommands implements CommandExecutor, TabCompleter {
 
     Map<String, String> commandList = new HashMap<String, String>() {{
-        put("play", "ttt.play");
+        put("tool", "ttt.tool");
         put("sounds off", "ttt.play");
         put("sounds on", "ttt.play");
         if (getMain().getConfig().getBoolean("essentials-support") && getEssentials() != null) put("challenge player $playerList", "ttt.play");
@@ -45,7 +45,7 @@ public class AllCommands implements CommandExecutor, TabCompleter {
         String cmd = getCommand(player, args).toLowerCase();
         switch(cmd) {
 
-            case "play":
+            case "tool":
                 ChallengeStick.spawnItem(player);
                 break;
             case "sounds on":
@@ -149,7 +149,7 @@ public class AllCommands implements CommandExecutor, TabCompleter {
                 returnList.add(currentArg);
 
             for (String s : invokeReturns) {
-                if (s.startsWith(playersCurrentArg))
+                if (s.toLowerCase().startsWith(playersCurrentArg.toLowerCase()))
                     returnList.add(s);
             }
 

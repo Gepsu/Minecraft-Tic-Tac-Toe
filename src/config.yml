@@ -43,13 +43,23 @@ player2-shape:
   - "x---x"
   - "-xxx-"
 
-# The stick's name
+# Tool used to play
+# All materials can be found here:
+# https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
 item-name: "&6&lStick&f&lTac&6&lToe"
+item-material: STICK
+item-lore:
+  -
+  -
+  -
+  -
 
 # Chat Messages
 win-message: "&aYou won!"
 lose-message: "&cYou lost!"
 tie-message: "&eYou tied!"
+win-bet-message: "&aYou won &2$$bet&a!"
+lose-bet-message: "&cYou lost &4$$bet&c!"
 reward-limit-reached: "&eReward limit reached!"
 you-dont-have-permission: "&cYou don't have a permission to play."
 other-player-doesnt-have-permission: "&cThey don't have a permission to play."

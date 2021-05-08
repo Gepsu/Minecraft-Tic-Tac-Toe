@@ -18,6 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class TicTacToe extends JavaPlugin implements CommandExecutor {
 
@@ -61,9 +62,18 @@ public class TicTacToe extends JavaPlugin implements CommandExecutor {
     }
 
     public static ItemStack getChallengeItem() {
-        ItemStack stickTacToe = new ItemStack(Material.STICK, 1);
+        String materialString = getMain().getConfig().getString("item-material");
+        if (materialString == null) materialString = "STICK";
+
+        Material itemMaterial = Material.getMaterial(materialString);
+        ItemStack stickTacToe = new ItemStack(itemMaterial, 1);
         ItemMeta meta = stickTacToe.getItemMeta();
         meta.setDisplayName(getStringInConfig("item-name"));
+        List<String> lore = getMain().getConfig().getStringList("item-lore");
+        lore = lore.stream()
+                .map(l -> ChatColor.translateAlternateColorCodes('&', l))
+                .collect(Collectors.toList());
+        meta.setLore(lore);
         stickTacToe.setItemMeta(meta);
 
         return stickTacToe;

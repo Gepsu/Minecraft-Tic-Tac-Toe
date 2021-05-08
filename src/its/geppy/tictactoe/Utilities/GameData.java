@@ -322,20 +322,20 @@ public class GameData {
         clickables.clear();
 
         if (winner.equals(Winner.CHALLENGER)) {
-            challenger.sendMessage(TicTacToe.getStringInConfig("win-message"));
+            challenger.sendMessage(bet == 0 ? TicTacToe.getStringInConfig("win-message") : TicTacToe.getStringInConfig("win-bet-message").replaceAll("\\$bet", String.valueOf(bet)));
             SoundCommands.playSound(challenger, Sound.ENTITY_PLAYER_LEVELUP);
 
-            opponent.sendMessage(TicTacToe.getStringInConfig("lose-message"));
+            opponent.sendMessage(bet == 0 ? TicTacToe.getStringInConfig("lose-message") : TicTacToe.getStringInConfig("lose-bet-message").replaceAll("\\$bet", String.valueOf(bet)));
             if (opponent instanceof Player)
                 SoundCommands.playSound((Player) opponent, Sound.ENTITY_PLAYER_HURT);
 
             RewardManager.giveReward(this, winner);
 
         } else if (winner.equals(Winner.OPPONENT)) {
-            challenger.sendMessage(TicTacToe.getStringInConfig("lose-message"));
+            challenger.sendMessage(bet == 0 ? TicTacToe.getStringInConfig("lose-message") : TicTacToe.getStringInConfig("lose-bet-message").replaceAll("\\$bet", String.valueOf(bet)));
             SoundCommands.playSound(challenger, Sound.ENTITY_PLAYER_HURT);
 
-            opponent.sendMessage(TicTacToe.getStringInConfig("win-message"));
+            opponent.sendMessage(bet == 0 ? TicTacToe.getStringInConfig("win-message") : TicTacToe.getStringInConfig("win-bet-message").replaceAll("\\$bet", String.valueOf(bet)));
             if (opponent instanceof Player)
                 SoundCommands.playSound((Player) opponent, Sound.ENTITY_PLAYER_LEVELUP);
 

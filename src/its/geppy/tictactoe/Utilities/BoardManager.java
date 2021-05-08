@@ -18,8 +18,11 @@ public class BoardManager {
     public static void buildBoard(Player player, LivingEntity opponent, long bet) {
         Location center = player.getEyeLocation().add(opponent.getEyeLocation()).multiply(.5).subtract(0, boardSize/2, 0);
 
-        while (!center.getBlock().getType().equals(Material.AIR)) {
-            center.add(0, 0.3, 0);
+        for (int i = 0; i < 7; i++){
+            center.add(0, 0.2, 0);
+
+            if (center.getBlock().getType().equals(Material.AIR))
+                break;
         }
 
         ArmorStand stand = center.getWorld().spawn(center.clone().add(0, -1, 0), ArmorStand.class, (setting) -> {

@@ -33,7 +33,6 @@ public class onPlayerQuitEvent implements Listener {
         }
 
         game.endGame();
-                //ifPresent(c -> c.queueGameEnd(c.getTaskID(), c.getChallenger().isOnline() && c.getOpponent(). ? GameData.Winner.CHALLENGER : GameData.Winner.OPPONENT));
 
     }
 
