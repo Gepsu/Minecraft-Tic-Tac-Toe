@@ -2,7 +2,7 @@
 minimum-distance-between-boards: 3
 
 # Stops players from spawning new items over and over
-sticktactoe-cooldown-in-seconds: 60
+tool-cooldown-in-seconds: 60
 
 # Removes the board after X seconds
 maximum-idle-time-in-seconds: 30
@@ -77,6 +77,8 @@ cancel-button: "&c&l[CANCEL]"
 deny-button: "&c&l[DENY]"
 accept-button: "&a&l[ACCEPT]"
 cancelled-challenge: "&aChallenge against &2$player&a was cancelled."
+tool-already-in-inventory: "&cYou already have the tool."
+tool-command-in-cooldown: "&cCommand is in cooldown."
 
 # List of entities player can play against. PLAYER automatically included!
 # Entity types can be found here:

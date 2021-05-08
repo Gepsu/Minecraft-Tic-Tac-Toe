@@ -1,8 +1,6 @@
 package its.geppy.tictactoe.Commands;
 
 import its.geppy.tictactoe.TicTacToe;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -18,12 +16,12 @@ public class ChallengeStick {
     public static void spawnItem(Player player) {
 
         if (player.getInventory().contains(TicTacToe.getChallengeItem())) {
-            player.sendMessage(ChatColor.RED + "You already have the item.");
+            player.sendMessage(TicTacToe.getStringInConfig("tool-already-in-inventory"));
             return;
         }
 
         if (isInCooldown(player)) {
-            player.sendMessage(ChatColor.RED + "The command is in cooldown.");
+            player.sendMessage(TicTacToe.getStringInConfig("tool-command-in-cooldown"));
             return;
         }
 
@@ -39,7 +37,7 @@ public class ChallengeStick {
     }
 
     private static boolean isInCooldown(Player player) {
-        if (player.hasPermission("ttt.play.nocooldown"))
+        if (player.hasPermission("ttt.tool.nocooldown"))
             return false;
 
         if (!cooldowns.containsKey(player.getUniqueId()))
@@ -52,7 +50,7 @@ public class ChallengeStick {
     }
 
     private static void setCooldown(Player player) {
-        int cooldownLength = TicTacToe.getMain().getConfig().getInt("sticktactoe-cooldown-in-seconds");
+        int cooldownLength = TicTacToe.getMain().getConfig().getInt("tool-cooldown-in-seconds");
 
         LocalDateTime time = LocalDateTime.now().plusSeconds(cooldownLength);
 
