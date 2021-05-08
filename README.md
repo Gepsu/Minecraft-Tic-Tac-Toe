@@ -9,8 +9,8 @@ A Tic Tac Toe plugin for Minecraft Spigot using particles.
 - Automatically resets the board if you walk too far or if a player quits
 - You can set rewards in the config file. Examples included
 - Players can change their particles to anything you've listed
-- You can customize the shape for each player
 - You can change/translate nearly all chat messages
+- You can customize the shape
 - Support for Essentials
 - Sounds!
 
