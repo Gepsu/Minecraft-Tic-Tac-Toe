@@ -1,6 +1,6 @@
 name: TicTacToe
 api-version: 1.16
-version: 1.3
+version: 1.3.2
 author: ItsGeppy
 main: its.geppy.tictactoe.TicTacToe
 softdepend:

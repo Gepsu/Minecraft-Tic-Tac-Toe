@@ -41,7 +41,7 @@ public class BoardManager {
         for (double x = -(boardSize/2); x < boardSize/2; x += particleStep) {
             for (double y = -(boardSize/2); y < boardSize/2; y += particleStep) {
 
-                Vector vector = game.calculatePosition(x, y);
+                Vector vector = calculatePosition(game, x, y);
 
                 if ((x + boardSize/2 > boardSize * (0.34 - thickness) && x + boardSize/2 < boardSize * (0.33 + thickness)) ||
                     (x + boardSize/2 > boardSize * (0.66 - thickness) && x + boardSize/2 < boardSize * (0.66 + thickness)) ||
@@ -61,7 +61,7 @@ public class BoardManager {
                 double dx = boardSize * x / 3;
                 double dy = boardSize * y / 3;
 
-                Vector vector = game.calculatePosition(dx, dy);
+                Vector vector = calculatePosition(game, dx, dy);
                 vector.subtract(new Vector(0, .3, 0));
 
                 game.clickables.put(vector, new Byte[]{(byte) x, (byte) y});
@@ -93,7 +93,7 @@ public class BoardManager {
                 double dx = (x - 2) * (boardSize * 0.04);
                 double dy = (y - 2) * (boardSize * 0.04);
 
-                Vector vector = game.calculatePosition(clickable.toLocation(game.getChallenger().getWorld()).add(0, -(boardSize * 0.45), 0).toVector(), dx, dy);
+                Vector vector = calculatePosition(game, clickable.toLocation(game.getChallenger().getWorld()).add(0, -(boardSize * 0.45), 0).toVector(), dx, dy);
                 game.particleMap.put(vector, game.getTurn() == GameData.Turn.O ? GameData.ParticleJob.O : GameData.ParticleJob.X);
 
             }
@@ -136,4 +136,21 @@ public class BoardManager {
 
         return finalClickable;
     }
+
+    private static Vector calculatePosition(GameData game, Vector origin, double x, double y) {
+        return new Vector(
+                origin.getX() + x * game.getDirection().getZ(),
+                origin.getY() + y + BoardManager.boardSize / 2,
+                origin.getZ() + x * -game.getDirection().getX()
+        );
+    }
+
+    private static Vector calculatePosition(GameData game, double x, double y) {
+        return new Vector(
+                game.getOrigin().getX() + x * game.getDirection().getZ(),
+                game.getOrigin().getY() + y + BoardManager.boardSize / 2,
+                game.getOrigin().getZ() + x * -game.getDirection().getX()
+        );
+    }
+
 }

@@ -47,6 +47,10 @@ public class GameData {
             {"", "", ""}
     };
 
+    public Vector getOrigin() { return origin; }
+
+    public Vector getDirection() { return direction; }
+
     public enum ParticleJob {
         DEBUG,
         FRAME,
@@ -127,22 +131,6 @@ public class GameData {
     }
 
     public Map<Vector, Byte[]> getClickables() { return clickables; }
-
-    public Vector calculatePosition(Vector origin, double x, double y) {
-        return new Vector(
-                origin.getX() + x * direction.getZ(),
-                origin.getY() + y + BoardManager.boardSize / 2,
-                origin.getZ() + x * -direction.getX()
-        );
-    }
-
-    public Vector calculatePosition(double x, double y) {
-        return new Vector(
-                origin.getX() + x * direction.getZ(),
-                origin.getY() + y + BoardManager.boardSize / 2,
-                origin.getZ() + x * -direction.getX()
-        );
-    }
 
     public void removeClickable(Vector clickable) {
         ticksSinceReset = 0;

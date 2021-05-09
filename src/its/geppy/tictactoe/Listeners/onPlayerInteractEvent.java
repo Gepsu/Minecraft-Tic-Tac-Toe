@@ -99,6 +99,9 @@ public class onPlayerInteractEvent implements Listener {
         if (!heldItem.isSimilar(TicTacToe.getToolItem()))
             return;
 
+        if (e.getHand() == null)
+            return;
+
         if (!e.getHand().equals(EquipmentSlot.HAND))
             return;
 
