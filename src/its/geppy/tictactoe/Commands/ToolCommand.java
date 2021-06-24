@@ -57,5 +57,4 @@ public class ToolCommand {
         cooldowns.put(player.getUniqueId(), time);
 
     }
-
 }

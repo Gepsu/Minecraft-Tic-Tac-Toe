@@ -36,6 +36,9 @@ public class ChallengeCommand {
             return;
         }
 
+        if (TicTacToe.isPlaying(player) != null) return;
+        if (TicTacToe.isPlaying(targetPlayer) != null) return;
+
         if (!targetPlayer.hasPermission("ttt.play")) {
             player.sendMessage(TicTacToe.getStringInConfig("other-player-doesnt-have-permission"));
             return;
@@ -100,6 +103,8 @@ public class ChallengeCommand {
             return;
         }
 
+        if (TicTacToe.isPlaying(player) != null) return;
+
         Challenge challenge = getChallenge(player, args);
         if (challenge == null)
             return;
@@ -137,9 +142,7 @@ public class ChallengeCommand {
             SoundCommands.playSound(targetPlayer, Sound.BLOCK_BELL_RESONATE);
             BoardManager.buildBoard(challenger, targetPlayer, betAmount);
 
-        } catch (MaxMoneyException e) {
-
-        }
+        } catch (Exception ignored) { }
 
         activeChallenges.remove(challenge);
 

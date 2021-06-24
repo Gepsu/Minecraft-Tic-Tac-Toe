@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
@@ -81,9 +82,7 @@ public class TicTacToe extends JavaPlugin implements CommandExecutor {
         tool.setItemMeta(meta);
     }
 
-    public static ItemStack getToolItem() {
-        return tool;
-    }
+    public static ItemStack getToolItem() { return tool; }
 
     public static Essentials getEssentials() {
         Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("Essentials");
@@ -94,6 +93,21 @@ public class TicTacToe extends JavaPlugin implements CommandExecutor {
 
     public static String getStringInConfig(String path) {
         return ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(getMain().getConfig().getString(path)));
+    }
+
+    public static GameData isPlaying(LivingEntity entity) {
+        return TicTacToe.activeGames.stream()
+                .filter(game -> {
+                    if (game.getChallenger().equals(entity))
+                        return true;
+
+                    if (game.getOpponent().equals(entity))
+                        return true;
+
+                    return false;
+                })
+                .findFirst()
+                .orElse(null);
     }
 
 }

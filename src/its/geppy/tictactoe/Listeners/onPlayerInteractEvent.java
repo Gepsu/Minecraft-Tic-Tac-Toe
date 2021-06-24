@@ -67,22 +67,9 @@ public class onPlayerInteractEvent implements Listener {
             }
         }
 
-        if (TicTacToe.activeGames.stream().anyMatch(game -> {
-            if (game.getChallenger().equals(player))
-                return true;
+        if (TicTacToe.isPlaying(player) != null) return;
 
-            if (game.getOpponent().equals(player))
-                return true;
-
-            if (game.getChallenger().equals(opponent))
-                return true;
-
-            if (game.getOpponent().equals(opponent))
-                return true;
-
-            return false;
-        }))
-            return;
+        if (TicTacToe.isPlaying(opponent) != null) return;
 
         SoundCommands.playSound(player, Sound.BLOCK_BELL_RESONATE);
         if (opponent instanceof Player)
@@ -105,10 +92,7 @@ public class onPlayerInteractEvent implements Listener {
         if (!e.getHand().equals(EquipmentSlot.HAND))
             return;
 
-        GameData game = TicTacToe.activeGames.stream()
-                .filter(g -> g.getChallenger().equals(e.getPlayer()) || g.getOpponent().equals(e.getPlayer()))
-                .findFirst()
-                .orElse(null);
+        GameData game = TicTacToe.isPlaying(e.getPlayer());
 
         if (game == null)
             return;
@@ -126,14 +110,13 @@ public class onPlayerInteractEvent implements Listener {
 
         }
 
-        if (e.getPlayer().equals(game.getChallenger()) || e.getPlayer().equals(game.getOpponent())) {
-            Vector clickable = BoardManager.getClickable(e.getPlayer(), game);
+        Vector clickable = BoardManager.getClickable(e.getPlayer(), game);
 
-            if (clickable != null) {
-                SoundCommands.playSound(e.getPlayer(), Sound.BLOCK_STONE_BUTTON_CLICK_ON);
-                BoardManager.clicked(clickable, game);
-            }
+        if (clickable != null) {
+            SoundCommands.playSound(e.getPlayer(), Sound.BLOCK_STONE_BUTTON_CLICK_ON);
+            BoardManager.clicked(clickable, game);
         }
+
 
     }
 

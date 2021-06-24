@@ -2,7 +2,6 @@ package its.geppy.tictactoe.Listeners;
 
 import its.geppy.tictactoe.TicTacToe;
 import its.geppy.tictactoe.Utilities.GameData;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
